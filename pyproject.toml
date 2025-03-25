@@ -1,0 +1,12 @@
+[project]
+name = "nmea2000_server"
+version = "0.0.1"
+authors = [
+    {name = "Alexey Matveev", email = "a.matveev@gmail.com"},
+]
+readme = "README.md"
+requires-python = ">=3.9"
+
+dependencies = [
+    "python-can",
+]

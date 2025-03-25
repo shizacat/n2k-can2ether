@@ -7,3 +7,12 @@ Source:
 
 Трансилируемый формат, выходной формат:
   - Yacht Devices RAW TCP, ydwg02
+
+## Development
+
+```bash
+python3 -m venv venv
+
+# install requirements
+pip install .
+```
