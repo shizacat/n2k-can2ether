@@ -9,4 +9,7 @@ requires-python = ">=3.9"
 
 dependencies = [
     "python-can",
+    "python-can[gs_usb]",
+    "serial",
+    "pyusb",
 ]
