@@ -55,6 +55,7 @@ class Server(object):
         # Define variables
         self._server: Optional[asyncio.Server] = None
         self._can_bus: Optional[can.BusABC] = None
+        self._can_notifier: Optional[can.Notifier] = None
 
         self._event_stop = asyncio.Event()
 
@@ -74,6 +75,11 @@ class Server(object):
                 bitrate=self._can_bitrate,
                 **self._bus_fill_kwargs()
             )
+            self._can_notifier = can.Notifier(
+                bus=self._can_bus,
+                listeners=[self._can_msg_recipient],
+                loop=asyncio.get_running_loop(),
+            )
         except usb.core.USBError as e:
             raise RuntimeError(f"CAN bus open error: {e}")
 
@@ -86,6 +92,7 @@ class Server(object):
             )
             self._logger.error(f"Service start on {self._srv_get_bind_addr()}")
         except OSError as e:
+            self._can_notifier.stop()
             self._can_bus.shutdown()
             raise RuntimeError(f"Service start error: {e}")
 
@@ -94,6 +101,7 @@ class Server(object):
             await asyncio.Event().wait()
         except asyncio.exceptions.CancelledError:
             self._logger.info("Service stopped")
+        self._can_notifier.stop()
         self._can_bus.shutdown()
 
     def _bus_fill_kwargs(self) -> dict:
@@ -146,6 +154,15 @@ class Server(object):
                 item = str(name)
             addr = f"{addr}, {item}" if addr else item
         return addr
+
+    async def _can_msg_recipient(self, msg: can.Message):
+        """
+        Get recipient message from CAN bus
+        """
+        self._logger.debug(
+            f"Received message: ID: {msg.arbitration_id:08X}, "
+            f"Data: {msg.data.hex()}, DLC: {msg.dlc}"
+        )
 
 
 def parser_list_interfaces(args: argparse.Namespace):
