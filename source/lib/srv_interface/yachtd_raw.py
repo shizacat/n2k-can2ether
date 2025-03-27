@@ -35,7 +35,7 @@ class YachtdRaw(SrvInterfaceBase):
         raw_message = "{tm} {dir} {id} {data}\r\n".format(
             tm=self._get_time(msg),
             dir=DirectionMsg.RECEIVED.value,
-            id=msg.arbitration_id,
+            id=f"{msg.arbitration_id:08X}",
             data=" ".join(f"{byte:02X}" for byte in msg.data),
         )
 
