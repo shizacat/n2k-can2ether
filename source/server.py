@@ -18,6 +18,8 @@ from typing import Optional
 import can
 import usb
 
+from lib.srv_interface import SrvInterfaceBase
+
 
 class Server(object):
 
@@ -26,6 +28,7 @@ class Server(object):
         interface: str,
         can_bitrate: int,
         channel: str,
+        srv_interface: str,
         srv_bind_addr: Optional[str] = None,
         srv_port: Optional[int] = None,
         log_level: str = "ERROR",
@@ -35,6 +38,7 @@ class Server(object):
             interface: CAN interface for library python-can
             can_bitrate: CAN bitrate, bps
             channel: CAN channel, different for each interface
+            srv_interface: server interface
             srv_bind_addr: server bind address, default 0.0.0.0
             srv_port: server port, default 5000
             log_level: logging level, default ERROR
@@ -52,12 +56,19 @@ class Server(object):
         self._logger.setLevel(log_level)
         logging.basicConfig(level=log_level, format=fmt)
 
+        # Server interface
+        self._srv_interface = SrvInterfaceBase.get_interface(srv_interface)
+        self._logger.info(f"Server interface: {self._srv_interface.name}")
+
         # Define variables
         self._server: Optional[asyncio.Server] = None
         self._can_bus: Optional[can.BusABC] = None
         self._can_notifier: Optional[can.Notifier] = None
 
+        # __
         self._event_stop = asyncio.Event()
+        # List of clients writer
+        self._srv_client_writers: list[asyncio.StreamWriter] = []
 
     def start(self):
         asyncio.run(self._start())
@@ -133,12 +144,34 @@ class Server(object):
 
         Вызывается каждый раз, когда клиент подключается к серверу.
         """
-        self._logger.info("Client connected")
+        addr = writer.get_extra_info("peername")
 
-        # Read client request
-        # data = await reader.read(100)
-        # message = data.decode()
-        # addr = writer.get_extra_info("peername")
+        self._logger.info(f"Client connected: address={addr}")
+
+        # Setup
+        self._srv_client_writers.append(writer)
+
+        try:
+            while True:
+                # Читаем данные от клиента
+                data = await reader.read(200)
+                if not data:
+                    # Клиент отключился
+                    break
+
+                message = data.decode()
+                print(f"Получено: {message} от {addr}")
+
+                # response = f"Эхо: {message}"
+                # writer.write(response.encode())  # Отправляем ответ клиенту
+                # await writer.drain()  # Ожидаем завершения записи
+        except asyncio.CancelledError:
+            pass  # Разрешаем корректное завершение
+        finally:
+            self._logger.info(f"Client disconnected: {addr}")
+            self._srv_client_writers.remove(writer)
+            writer.close()
+            await writer.wait_closed()  # Закрываем соединение
 
     def _srv_get_bind_addr(self) -> str:
         """
@@ -163,6 +196,10 @@ class Server(object):
             f"Received message: ID: {msg.arbitration_id:08X}, "
             f"Data: {msg.data.hex()}, DLC: {msg.dlc}"
         )
+        # Send message to srv clients
+        for writer in self._srv_client_writers:
+            writer.write(self._srv_interface.convert_can_to_srv(msg))
+            await writer.drain()
 
 
 def parser_list_interfaces(args: argparse.Namespace):
@@ -183,6 +220,7 @@ def cmd_func_run(args: argparse.Namespace):
             interface=args.interface,
             can_bitrate=args.bitrate,
             channel=args.channel,
+            srv_interface=args.srv_interface,
             srv_bind_addr=args.bind_addr,
             srv_port=args.port,
             log_level=args.log_level,
@@ -206,6 +244,7 @@ def arguments(args: Optional[list] = None) -> argparse.Namespace:
     # Run server
     parser_run = subparsers.add_parser("run", help="Run server")
     parser_run.set_defaults(func=cmd_func_run)
+    # ___ can args ___
     parser_run.add_argument(
         "--interface",
         help="CAN interface",
@@ -237,6 +276,13 @@ def arguments(args: Optional[list] = None) -> argparse.Namespace:
         help="Server port, default 5000",
         type=int,
         default=None,
+    )
+    parser_run.add_argument(
+        "--srv-interface",
+        help="Server interface",
+        type=str,
+        required=True,
+        choices=SrvInterfaceBase.list_interfaces(),
     )
     # ___ General ___
     parser_run.add_argument(
