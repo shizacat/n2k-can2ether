@@ -101,7 +101,7 @@ class Server(object):
                 host=self._srv_bind_addr,
                 port=self._srv_port,
             )
-            self._logger.error(f"Service start on {self._srv_get_bind_addr()}")
+            self._logger.info(f"Service start on {self._srv_get_bind_addr()}")
         except OSError as e:
             self._can_notifier.stop()
             self._can_bus.shutdown()
