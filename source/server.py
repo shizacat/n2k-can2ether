@@ -84,6 +84,7 @@ class Server(object):
             self._can_bus = can.Bus(
                 interface=self._interface,
                 bitrate=self._can_bitrate,
+                receive_own_messages=False,
                 **self._bus_fill_kwargs()
             )
             self._can_notifier = can.Notifier(
@@ -154,17 +155,29 @@ class Server(object):
         try:
             while True:
                 # Читаем данные от клиента
-                data = await reader.read(200)
-                if not data:
-                    # Клиент отключился
-                    break
+                data = await reader.readuntil(
+                    separator=self._srv_interface.separator)
 
-                message = data.decode()
-                print(f"Получено: {message} от {addr}")
+                self._logger.debug(f"Received data: {data}")
+                try:
+                    can_msg = self._srv_interface.convert_srv_to_can(data)
+                except ValueError as e:
+                    self._logger.error(f"Invalid data: {e}")
+                    continue
 
-                # response = f"Эхо: {message}"
-                # writer.write(response.encode())  # Отправляем ответ клиенту
-                # await writer.drain()  # Ожидаем завершения записи
+                # Send message to CAN bus
+                try:
+                    self._can_bus.send(can_msg, timeout=1)
+                except can.exceptions.CanError as e:
+                    self._logger.error(f"CAN bus send error: {e}")
+                    continue
+
+                # Event after process
+                data_after = self._srv_interface.event_after_process_srv2can(
+                    can_msg)
+                if data_after:
+                    writer.write(data_after)
+                    await writer.drain()
         except asyncio.CancelledError:
             pass  # Разрешаем корректное завершение
         finally:

@@ -1,3 +1,5 @@
+from typing import Optional
+
 import can
 
 
@@ -8,12 +10,25 @@ class SrvInterfaceBase(object):
 
     # Interface name, unique
     name: str = ""
+    # Separator between messages from application
+    separator: bytes = b""
 
     def convert_can_to_srv(self, msg: can.Message) -> bytes:
         """
         Convert CAN message to server message
         """
         raise NotImplementedError()
+
+    def convert_srv_to_can(self, data: bytes) -> can.Message:
+        """
+        Convert server message to CAN message
+        """
+        raise NotImplementedError()
+
+    def event_after_process_srv2can(self, msg: can.Message) -> Optional[bytes]:
+        """
+        Event after processing server message to CAN message
+        """
 
     @classmethod
     def get_interface(cls, name: str) -> "SrvInterfaceBase":
