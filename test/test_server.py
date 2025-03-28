@@ -51,7 +51,9 @@ def server(
 # ==== Tests =====
 
 @pytest.mark.asyncio
-async def test_server_start(server, mock_can_bus, mock_can_notifier):
+async def test_server_start(
+    server: Server, mock_can_bus: AsyncMock, mock_can_notifier: AsyncMock
+) -> None:
     """Tests successful server startup and CAN initialization."""
     server._can_bus = mock_can_bus
     server._can_notifier = mock_can_notifier
@@ -67,7 +69,7 @@ async def test_server_start(server, mock_can_bus, mock_can_notifier):
 
 
 @pytest.mark.asyncio
-async def test_can_msg_recipient(server):
+async def test_can_msg_recipient(server: Server) -> None:
     """Tests the handling of incoming CAN messages."""
     server._srv_client_writers = [AsyncMock()]
     can_msg = MagicMock(arbitration_id=0x123, data=b"test", dlc=4)
@@ -80,7 +82,7 @@ async def test_can_msg_recipient(server):
 
 
 @pytest.mark.asyncio
-async def test_srv_handle(server):
+async def test_srv_handle(server: Server) -> None:
     """Tests the handling of a client connection."""
     reader = AsyncMock()
     writer = AsyncMock()
@@ -101,7 +103,7 @@ async def test_srv_handle(server):
 
 
 @pytest.mark.asyncio
-async def test_can_close(server):
+async def test_can_close(server: Server) -> None:
     """Tests the closing of the CAN interface."""
     server._can_notifier = MagicMock()
     server._can_bus = MagicMock()
