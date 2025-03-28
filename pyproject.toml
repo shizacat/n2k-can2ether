@@ -11,5 +11,6 @@ dependencies = [
     "python-can",
     "python-can[gs_usb]",
     "serial",
+    "pyserial",
     "pyusb",
 ]

@@ -16,3 +16,11 @@ python3 -m venv venv
 # install requirements
 pip install .
 ```
+
+## Run, configuration
+
+Config usb.backend libusb1
+
+Environment variables:
+- PYUSB_BACKEND - 'libusb1', указывает, что PyUSB должен использовать libusb1.
+- LIBUSB_DEBUG - уровень отладки, 0 - 3, 0 = выключено, 3 = максимум.

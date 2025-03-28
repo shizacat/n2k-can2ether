@@ -92,7 +92,7 @@ class Server(object):
                 listeners=[self._can_msg_recipient],
                 loop=asyncio.get_running_loop(),
             )
-        except usb.core.USBError as e:
+        except (usb.core.USBError, can.exceptions.CanError) as e:
             raise RuntimeError(f"CAN bus open error: {e}")
 
         # Create TCP server
@@ -104,8 +104,7 @@ class Server(object):
             )
             self._logger.info(f"Service start on {self._srv_get_bind_addr()}")
         except OSError as e:
-            self._can_notifier.stop()
-            self._can_bus.shutdown()
+            self._can_close()
             raise RuntimeError(f"Service start error: {e}")
 
         # Wait close
@@ -113,8 +112,17 @@ class Server(object):
             await asyncio.Event().wait()
         except asyncio.exceptions.CancelledError:
             self._logger.info("Service stopped")
-        self._can_notifier.stop()
-        self._can_bus.shutdown()
+        self._can_close()
+
+    def _can_close(self):
+        """
+        Close CAN bus
+        """
+        try:
+            self._can_notifier.stop()
+            self._can_bus.shutdown()
+        except can.exceptions.CanOperationError as e:
+            self._logger.error(f"CAN bus close error: {e}")
 
     def _bus_fill_kwargs(self) -> dict:
         """
@@ -155,6 +163,7 @@ class Server(object):
         try:
             while True:
                 # Читаем данные от клиента
+                # # TODO: asyncio.exceptions.IncompleteReadError, check
                 data = await reader.readuntil(
                     separator=self._srv_interface.separator)
 
