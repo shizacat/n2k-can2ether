@@ -21,21 +21,23 @@ class MockInterface(SrvInterfaceBase):
 
 
 @pytest.fixture
-def mock_can_bus():
+def mock_can_bus() -> AsyncMock:
     """Creates a mock object for can.Bus."""
     with patch("can.Bus") as mock:
         yield mock
 
 
 @pytest.fixture
-def mock_can_notifier():
+def mock_can_notifier() -> AsyncMock:
     """Creates a mock object for can.Notifier."""
     with patch("can.Notifier") as mock:
         yield mock
 
 
 @pytest.fixture
-def server(mock_can_bus, mock_can_notifier):
+def server(
+    mock_can_bus: AsyncMock, mock_can_notifier: AsyncMock
+) -> Server:
     """Creates a server instance with mocked CAN bus and notifier."""
     return Server(
         interface="virtual",
@@ -43,6 +45,7 @@ def server(mock_can_bus, mock_can_notifier):
         channel="vcan0",
         srv_interface="mock_interface",
     )
+
 
 
 # ==== Tests =====
