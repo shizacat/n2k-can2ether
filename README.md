@@ -1,19 +1,21 @@
-# NMEA2000 server
+# The pycantoether
 
-Транслирует данные из NMEA2000 в TCP сервер.
+NMEA2000 can bus to TCP server
 
-Source:
-  - can adapter, GS-USB (Geschwister Schneider). Скажем прошивка - Candle Light.
+This is bridge between NMEA2000 and TCP server.
 
-Трансилируемый формат, выходной формат:
-  - Yacht Devices RAW TCP, ydwg02
+Features:
+  - Support different NMEA2000 CAN bus adapters, base on python-can library.
+    - GS-USB (Geschwister Schneider), slcan and so on.
+  - Support different TCP server interface,
+    - Yacht Devices RAW TCP, ydwg02
+
 
 ## Development
 
 ```bash
 python3 -m venv venv
 
-# install requirements
 pip install .
 ```
 
@@ -22,5 +24,5 @@ pip install .
 Config usb.backend libusb1
 
 Environment variables:
-- PYUSB_BACKEND - 'libusb1', указывает, что PyUSB должен использовать libusb1.
-- LIBUSB_DEBUG - уровень отладки, 0 - 3, 0 = выключено, 3 = максимум.
+- PYUSB_BACKEND - 'libusb1', select libusb1 as backend for PyUSB.
+- LIBUSB_DEBUG - debug level, 0 - 3, 0 = off, 3 = max.
