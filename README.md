@@ -10,12 +10,17 @@ Features:
   - Support different TCP server interface,
     - Yacht Devices RAW TCP, ydwg02
 
+Requirements:
+  - python 3.9+
+
 
 ## Development
 
 ```bash
 python3 -m venv venv
+source venv/bin/activate
 
+# Install requirements
 pip install .
 ```
 
