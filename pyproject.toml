@@ -33,7 +33,7 @@ documentation = "https://github.com/shizacat/n2k-can2ether"
 repository = "https://github.com/shizacat/n2k-can2ether"
 
 [project.scripts]
-cantoether = "pycantoether.server:main"
+pycantoether = "pycantoether.server:main"
 
 [tool.setuptools.dynamic]
 version = {attr = "pycantoether.__version__"}

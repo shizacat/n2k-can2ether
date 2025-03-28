@@ -20,8 +20,8 @@ Requirements:
 python3 -m venv venv
 source venv/bin/activate
 
-# Install requirements
-pip install .
+# Install requirements, and editable this package
+pip install -e .
 ```
 
 ## Run, configuration

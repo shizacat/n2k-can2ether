@@ -18,7 +18,7 @@ from typing import Optional
 import can
 import usb
 
-from lib.srv_interface import SrvInterfaceBase
+from .lib.srv_interface import SrvInterfaceBase
 
 
 class Server(object):
