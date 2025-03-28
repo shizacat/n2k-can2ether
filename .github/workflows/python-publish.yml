@@ -29,7 +29,7 @@ jobs:
       - name: Build release distributions
         run: |
           # set version
-          sed -i "s/__version__.*/__version__ = \"${GITHUB_REF_NAME}\"/g" pycantoether/__init__.py
+          sed -i "s/__version__ = .*/__version__ = \"${GITHUB_REF_NAME}\"/g" pycantoether/__init__.py
           # requirements
           python -m pip install build
           # build
