@@ -47,7 +47,6 @@ def server(
     )
 
 
-
 # ==== Tests =====
 
 @pytest.mark.asyncio
