@@ -18,6 +18,7 @@ classifiers = [
 ]
 license = "Apache-2.0"
 license-files = ["LICEN[CS]E*"]
+dynamic = ["version", "readme"]
 
 dependencies = [
     "python-can",
@@ -27,7 +28,11 @@ dependencies = [
     "pyusb",
 ]
 
-dynamic = ["version", "readme"]
+[project.optional-dependencies]
+dev = [
+    "pytest",
+    "pytest-cov",
+]
 
 [project.urls]
 documentation = "https://github.com/shizacat/n2k-can2ether"

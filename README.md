@@ -29,6 +29,9 @@ source venv/bin/activate
 
 # Install requirements, and editable this package
 pip install -e .
+
+# Run tests
+python -m pytest --cov pycantoether
 ```
 
 ## Run, configuration
