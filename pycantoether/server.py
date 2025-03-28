@@ -318,7 +318,10 @@ def arguments(args: Optional[list] = None) -> argparse.Namespace:
     return parser.parse_args(args)
 
 
-if __name__ == '__main__':
-    # Test on gs_usb
+def main():
     args = arguments()
     args.func(args)
+
+
+if __name__ == '__main__':
+    main()
