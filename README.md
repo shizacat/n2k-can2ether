@@ -13,6 +13,13 @@ Features:
 Requirements:
   - python 3.9+
 
+## Install
+
+```bash
+pip install pycantoether
+```
+
+[Usage](docs/01.usage.md)
 
 ## Development
 
