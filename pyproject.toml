@@ -1,11 +1,22 @@
+[build-system]
+requires = [
+    "setuptools>=42",
+    "wheel"
+]
+build-backend = "setuptools.build_meta"
+
 [project]
-name = "nmea2000_server"
-version = "0.0.1"
+name = "pycantoether"
+description = "This is bridge between NMEA2000 and TCP server."
 authors = [
     {name = "Alexey Matveev", email = "a.matveev@gmail.com"},
 ]
-readme = "README.md"
 requires-python = ">=3.9"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent"
+]
 
 dependencies = [
     "python-can",
@@ -14,3 +25,22 @@ dependencies = [
     "pyserial",
     "pyusb",
 ]
+
+dynamic = ["version", "readme"]
+
+[project.urls]
+documentation = "https://github.com/shizacat/n2k-can2ether"
+repository = "https://github.com/shizacat/n2k-can2ether"
+
+[project.scripts]
+cantoether = "pycantoether.server:main"
+
+[tool.setuptools.dynamic]
+version = {attr = "pycantoether.__version__"}
+readme = {file = ["README.md"]}
+
+[tool.setuptools.packages.find]
+where = ["."]
+exclude = ["tests*",]
+include = ["pycantoether", "pycantoether.*"]
+namespaces = false
