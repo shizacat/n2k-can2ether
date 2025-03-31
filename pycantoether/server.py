@@ -85,7 +85,7 @@ class Server(object):
                 interface=self._interface,
                 bitrate=self._can_bitrate,
                 receive_own_messages=False,
-                **self._bus_fill_kwargs()
+                **self._bus_fill_kwargs(),
             )
             self._can_notifier = can.Notifier(
                 bus=self._can_bus,
@@ -165,7 +165,8 @@ class Server(object):
                 # Читаем данные от клиента
                 # # TODO: asyncio.exceptions.IncompleteReadError, check
                 data = await reader.readuntil(
-                    separator=self._srv_interface.separator)
+                    separator=self._srv_interface.separator
+                )
 
                 self._logger.debug(f"Received data: {data}")
                 try:
@@ -183,7 +184,8 @@ class Server(object):
 
                 # Event after process
                 data_after = self._srv_interface.event_after_process_srv2can(
-                    can_msg)
+                    can_msg
+                )
                 if data_after:
                     writer.write(data_after)
                     await writer.drain()
@@ -260,7 +262,8 @@ def arguments(args: Optional[list] = None) -> argparse.Namespace:
 
     # List of available backends
     parser_list_interfaces = subparsers.add_parser(
-        "list-interfaces", help="List of available interfaces")
+        "list-interfaces", help="List of available interfaces"
+    )
     parser_list_interfaces.set_defaults(func=parser_list_interfaces)
 
     # Run server
@@ -284,7 +287,7 @@ def arguments(args: Optional[list] = None) -> argparse.Namespace:
         "--channel",
         help="CAN channel, different for each interface",
         type=str,
-        default=""
+        default="",
     )
     # ___ tcp server args ___
     parser_run.add_argument(
@@ -323,5 +326,5 @@ def main():
     args.func(args)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

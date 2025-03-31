@@ -12,7 +12,7 @@ from enum import Enum
 from .base import SrvInterfaceBase
 
 
-class DirectionMsg(str,  Enum):
+class DirectionMsg(str, Enum):
     # from NMEA 2000 to application
     RECEIVED = "R"
     # from application to NMEA 2000
@@ -75,8 +75,7 @@ class YachtdRaw(SrvInterfaceBase):
         """
         Extract and format time from message
         """
-        timestamp = datetime.datetime.fromtimestamp(
-            msg.timestamp, datetime.UTC)
+        timestamp = datetime.datetime.fromtimestamp(msg.timestamp, datetime.UTC)
         return timestamp.strftime("%H:%M:%S.%f")[:-3]
 
     def _arbitration_id_to_int(self, arbitration_id: str) -> int:

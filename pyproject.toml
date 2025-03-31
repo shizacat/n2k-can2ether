@@ -51,3 +51,6 @@ where = ["."]
 exclude = ["tests*",]
 include = ["pycantoether", "pycantoether.*"]
 namespaces = false
+
+[tool.black]
+line-length = 80
